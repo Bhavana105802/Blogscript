@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Blogs - BlogScript</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .browse-controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sort-select {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-author {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .post-title {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .post-meta {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .post-category {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .post-content {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-like {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .btn-like.liked {
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+        }
+
+        .btn-read {
+            background: rgba(33, 150, 243, 0.3);
+            color: #2196F3;
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            font-size: 1.2rem;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .browse-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-controls {
+                justify-content: center;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Browse Blogs</h1>
+            <div class="nav-links">
+                <a href="/">🏠 Dashboard</a>
+                <a href="/create-post">✍️ Create Post</a>
+                <a href="/my-posts">📚 My Posts</a>
+                <a href="/analytics">📊 Analytics</a>
+                <a href="/settings">⚙️ Settings</a>
+            </div>
+        </div>
+
+        <div class="browse-controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search blogs...">
+            </div>
+            <div class="filter-controls">
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="General">General</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Lifestyle">Lifestyle</option>
+                    <option value="Business">Business</option>
+                    <option value="Health">Health</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Food">Food</option>
+                    <option value="Education">Education</option>
+                </select>
+                <select class="sort-select" id="sortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="popular">Most Popular</option>
+                    <option value="views">Most Viewed</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="message"></div>
+        <div id="postsContainer">
+            <div class="loading">🌐 Loading blogs...</div>
+        </div>
+    </div>
+
+    <script>
+        let allPosts = [];
+        let filteredPosts = [];
+        let likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+
+        // Check authentication
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = '/auth.html';
+        }
+
+        // Load posts on page load
+        loadAllPosts();
+
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', filterPosts);
+        document.getElementById('categoryFilter').addEventListener('change', filterPosts);
+        document.getElementById('sortSelect').addEventListener('change', filterPosts);
+
+        async function loadAllPosts() {
+            try {
+                const response = await fetch('/api/posts');
+                const result = await response.json();
+
+                if (result.success) {
+                    allPosts = result.posts;
+                    filteredPosts = [...allPosts];
+                    filterPosts();
+                } else {
+                    showMessage('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Network error loading posts', 'error');
+            }
+        }
+
+        function filterPosts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const sortOption = document.getElementById('sortSelect').value;
+
+            // Filter posts
+            filteredPosts = allPosts.filter(post => {
+                const matchesSearch = post.title.toLowerCase().includes(searchTerm) ||
+                                    post.content.toLowerCase().includes(searchTerm) ||
+                                    post.author.toLowerCase().includes(searchTerm) ||
+                                    (post.tags && post.tags.some(tag => tag.toLowerCase().includes(searchTerm)));
+                
+                const matchesCategory = !categoryFilter || post.category === categoryFilter;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            // Sort posts
+            switch (sortOption) {
+                case 'newest':
+                    filteredPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    break;
+                case 'oldest':
+                    filteredPosts.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    break;
+                case 'popular':
+                    filteredPosts.sort((a, b) => b.likes - a.likes);
+                    break;
+                case 'views':
+                    filteredPosts.sort((a, b) => b.views - a.views);
+                    break;
+            }
+
+            renderPosts();
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+
+            if (filteredPosts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📝 No blogs found</h3>
+                        <p>No blogs match your search criteria. Try adjusting your filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const postsHTML = filteredPosts.map(post => `
+                <div class="post-card" onclick="readPost(${post.id})">
+                    <div class="post-author">
+                        👤 ${post.author}
+                    </div>
+                    
+                    <div class="post-category">${post.category}</div>
+                    <h3 class="post-title">${post.title}</h3>
+                    
+                    <div class="post-meta">
+                        📅 ${new Date(post.createdAt).toLocaleDateString()}
+                    </div>
+                    
+                    <div class="post-content">
+                        ${post.content}
+                    </div>
+                    
+                    ${post.tags && post.tags.length > 0 ? `
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="post-stats">
+                        <span>👁️ ${post.views} views</span>
+                        <span>❤️ ${post.likes} likes</span>
+                        <span>💬 ${post.commentsCount || 0} comments</span>
+                    </div>
+                    
+                    <div class="post-actions" onclick="event.stopPropagation()">
+                        <button class="btn btn-like ${likedPosts.includes(post.id) ? 'liked' : ''}" 
+                                onclick="likePost(${post.id})">
+                            ${likedPosts.includes(post.id) ? '❤️ Liked' : '🤍 Like'}
+                        </button>
+                        <button class="btn btn-read" onclick="readPost(${post.id})">
+                            📖 Read More
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `<div class="posts-grid">${postsHTML}</div>`;
+        }
+
+        async function likePost(postId) {
+            try {
+                const response = await fetch(`/api/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update local state
+                    if (!likedPosts.includes(postId)) {
+                        likedPosts.push(postId);
+                        localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
+                    }
+
+                    // Update post likes in local array
+                    const post = allPosts.find(p => p.id === postId);
+                    if (post) {
+                        post.likes = result.likes;
+                    }
+
+                    // Re-render posts
+                    filterPosts();
+                    showMessage('❤️ Post liked!', 'success');
+                } else {
+                    showMessage('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Network error liking post', 'error');
+            }
+        }
+
+        async function readPost(postId) {
+            try {
+                const response = await fetch(`/api/posts/${postId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update views in local array
+                    const post = allPosts.find(p => p.id === postId);
+                    if (post) {
+                        post.views = result.post.views;
+                    }
+
+                    // For now, show an alert with post content
+                    // In a full implementation, you'd navigate to a dedicated post page
+                    alert(`${result.post.title}\n\nBy: ${result.post.author}\nCategory: ${result.post.category}\nViews: ${result.post.views}\n\n${result.post.content}`);
+                    
+                    // Re-render to update view count
+                    filterPosts();
+                } else {
+                    showMessage('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Network error reading post', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+            
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

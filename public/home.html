@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlogScript - Share Your Stories</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        overflow-x: hidden;
+    }
+
+    /* Navigation - Updated to be transparent */
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0); /* Transparent background */
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        padding: 1rem 0;
+        transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+        background: rgba(0, 0, 0, 0.7); /* Semi-transparent when scrolled */
+        padding: 0.5rem 0;
+    }
+
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+    }
+
+    /* Updated logo color to #ffa726 */
+    .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #ffa726;
+        text-decoration: none;
+    }
+
+    .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+    }
+
+    .nav-menu a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-weight: 500;
+    }
+
+    .nav-menu a:hover {
+        color: #ffa726;
+    }
+
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .hamburger span {
+        width: 25px;
+        height: 3px;
+        background: white;
+        margin: 3px 0;
+        transition: 0.3s;
+    }
+
+    /* Hero Section */
+    .hero {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .hero video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        transform: translateX(-50%) translateY(-50%);
+        z-index: -2;
+        filter: brightness(0.7) contrast(1.2) saturate(1.1);
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(255, 111, 97, 0.2));
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .hero-content {
+        color: white;
+        max-width: 800px;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-content h1 {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        background: linear-gradient(45deg, #ff6f61, #ffa726);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-content p {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-button {
+        display: inline-block;
+        padding: 15px 35px;
+        background: linear-gradient(45deg, #ff6f61, #e85a4f);
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 111, 97, 0.4);
+        cursor: pointer;
+        border: none;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(255, 111, 97, 0.6);
+    }
+
+    /* Sign/Signup Button */
+    .sign-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background: transparent;
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: 2px solid #ffa726;
+        cursor: pointer;
+    }
+
+    .sign-button:hover {
+        background: #ffa726;
+        color: white;
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        animation: bounce 2s infinite;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* About Section */
+    .about {
+        padding: 100px 0;
+        background: linear-gradient(45deg, #ff6f61, #e85a4f);
+        color: white;
+    }
+
+    .about-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .about-text h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: white;
+    }
+
+    .about-text p {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 1.5rem;
+    }
+
+    .about-image {
+        width: 100%;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Newsletter Section */
+    .newsletter {
+        padding: 80px 0;
+        background: white;
+        color: #333;
+        text-align: center;
+    }
+
+    .newsletter h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .newsletter p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #666;
+    }
+
+    .newsletter-form {
+        display: flex;
+        max-width: 500px;
+        margin: 0 auto;
+        gap: 1rem;
+    }
+
+    .newsletter-input {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50px;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+    .newsletter-input:focus {
+        border-color: #ffa726;
+    }
+
+    .newsletter-button {
+        padding: 15px 30px;
+        background: linear-gradient(45deg, #ff6f61, #e85a4f);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .newsletter-button:hover {
+        transform: scale(1.05);
+    }
+
+    /* Footer */
+    .footer {
+        background: #333;
+        color: white;
+        padding: 50px 0 20px;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 1rem;
+        color: #ffa726;
+    }
+
+    .footer-section a {
+        color: #ccc;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .footer-section a:hover {
+        color: #ffa726;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .social-links a {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        background: #ffa726;
+        color: white;
+        text-align: center;
+        line-height: 40px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .social-links a:hover {
+        transform: scale(1.1);
+        background: #e85a4f;
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid #555;
+        color: #ccc;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0) translateX(-50%);
+        }
+        40% {
+            transform: translateY(-10px) translateX(-50%);
+        }
+        60% {
+            transform: translateY(-5px) translateX(-50%);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hamburger {
+            display: flex;
+        }
+
+        .nav-menu {
+            position: fixed;
+            left: -100%;
+            top: 70px;
+            flex-direction: column;
+            background-color: rgba(0, 0, 0, 0.8);
+            width: 100%;
+            text-align: center;
+            transition: 0.3s;
+            padding: 2rem 0;
+        }
+
+        .nav-menu.active {
+            left: 0;
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+        }
+
+        .about-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .newsletter-form {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+    /* Loading Animation */
+    .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+    }
+
+    .loading.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #555;
+        border-top: 5px solid #ffa726;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+<!-- Loading Screen -->
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo">BlogScript</a>
+        <ul class="nav-menu" id="nav-menu">
+            <li><a href="#" class="sign-button" onclick="openAuthPage()">Sign In/Sign Up</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <video autoplay muted loop id="hero-video">
+        <source src="4828605-uhd_4096_2160_25fps.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+    <div class="hero-overlay">
+        <div class="hero-content">
+            <h1>BlogScript</h1>
+            <p>Share stories, Tech diaries, travel diaries & food adventures with the world</p>
+            <button class="cta-button" onclick="openBlogsPage()">Explore Blogs</button>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about" id="about">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>About BlogScript</h2>
+                <p>Welcome to BlogScript, where stories come to life. We believe that everyone has a unique story to tell, whether it's about their latest travel adventure, a delicious recipe they discovered, or insights from their daily life.</p>
+                <p>Our platform provides a beautiful space for writers and readers to connect, share experiences, and inspire each other through the power of storytelling.</p>
+                <p>Join our community of passionate storytellers and discover amazing content from around the world.</p>
+            </div>
+            <div class="about-image">
+                <i class="fas fa-pen-fancy"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter" id="contact">
+    <div class="container">
+        <h2>Stay Updated</h2>
+        <p>Subscribe to our newsletter and never miss a great story</p>
+        <form class="newsletter-form" id="newsletter-form">
+            <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+            <button type="submit" class="newsletter-button">Subscribe</button>
+        </form>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BlogScript</h3>
+                <p>Your platform for sharing amazing stories and connecting with fellow storytellers.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a onclick="openAuthPage()">Sign In</a>
+                <a onclick="openAuthPage()">Sign Up</a>
+            </div>
+            <div class="footer-section">
+                <h3>Categories</h3>
+                <a href="#">Travel</a>
+                <a href="#">Food</a>
+                <a href="#">Lifestyle</a>
+                <a href="#">Technology</a>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <a href="#">Help Center</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 BlogScript. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // DOM Elements
+    const loading = document.getElementById('loading');
+    const navbar = document.getElementById('navbar');
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    const newsletterForm = document.getElementById('newsletter-form');
+    const heroVideo = document.getElementById('hero-video');
+
+    // Loading screen
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            loading.classList.add('hidden');
+        }, 1500);
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Mobile menu toggle
+    hamburger.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+        });
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Newsletter form submission
+    newsletterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = e.target.querySelector('.newsletter-input').value;
+        
+        alert(`Thank you for subscribing with email: ${email}`);
+        e.target.reset();
+    });
+
+    // Navigation functions
+    function openAuthPage() {
+        window.location.href = 'auth.html';
+    }
+
+    function openBlogsPage() {
+        window.location.href = 'blogs.html';
+    }
+
+    // Video optimization
+    heroVideo.addEventListener('loadeddata', () => {
+        heroVideo.play();
+    });
+
+    // Parallax effect for hero section
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.hero');
+        const speed = scrolled * 0.5;
+        
+        if (parallax) {
+            parallax.style.transform = `translateY(${speed}px)`;
+        }
+    });
+
+    // Add typing effect to hero title
+    function typeWriter(element, text, speed = 100) {
+        let i = 0;
+        element.innerHTML = '';
+        
+        function type() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        
+        type();
+    }
+
+    // Initialize typing effect after loading
+    setTimeout(() => {
+        const heroTitle = document.querySelector('.hero-content h1');
+        if (heroTitle) {
+            typeWriter(heroTitle, 'BlogScript', 150);
+        }
+    }, 2000);
+
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe elements for animation
+    document.addEventListener('DOMContentLoaded', () => {
+        const animatedElements = document.querySelectorAll('.about-content, .newsletter');
+        animatedElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    });
+</script>
+</body>
+</html>

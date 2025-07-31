@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Bhavana",
+    "email": "bhaaaa@gmail.com",
+    "password": "$2a$12$TaIh4mQH4sRW/u11jtpBbO4/NCO074jp2I6DnNf0H2o4mNKuS.hDi",
+    "createdAt": "2025-07-30T15:55:18.194Z",
+    "lastLogin": "2025-07-30T16:06:57.944Z",
+    "posts": [
+      1
+    ],
+    "totalViews": 0,
+    "totalLikes": 0,
+    "followers": 0
+  },
+  {
+    "id": 2,
+    "name": "riya",
+    "email": "riya@gmail.com",
+    "password": "$2a$12$ofNmn4On5veP4IwRwpdqPuO/fMcgcJCHsTYWwrwwvxCFmv/Q0UGFW",
+    "createdAt": "2025-07-31T04:07:57.936Z",
+    "lastLogin": "2025-07-31T04:26:26.968Z",
+    "posts": [
+      2
+    ],
+    "totalViews": 0,
+    "totalLikes": 0,
+    "followers": 0,
+    "bio": "",
+    "avatar": ""
+  }
+]

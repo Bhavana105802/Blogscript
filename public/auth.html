@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogScript - Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Background Video */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .video-background video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translateX(-50%) translateY(-50%);
+            filter: brightness(0.4) contrast(1.2) saturate(1.1);
+            object-fit: cover;
+        }
+
+        /* Fallback background */
+        .video-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: -1;
+        }
+
+        /* Glass Container */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 
+                0 25px 45px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-header h1 {
+            color: #ffa726;
+            margin-bottom: 0.5rem;
+            font-size: 2.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Toggle buttons */
+        .toggle-buttons {
+            display: flex;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.4);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffa726;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 0 0 3px rgba(255, 167, 38, 0.2),
+                0 4px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group input.error {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 
+                0 8px 25px rgba(255, 167, 38, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 35px rgba(255, 167, 38, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .submit-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Message styling */
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            display: none;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #c8e6c9;
+            border-color: rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1);
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ffcdd2;
+            border-color: rgba(244, 67, 54, 0.3);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.1);
+        }
+
+        /* Form visibility */
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Back link */
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-link a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-block;
+        }
+
+        .back-link a:hover {
+            color: #ffa726;
+            background: rgba(255, 167, 38, 0.1);
+            border-color: rgba(255, 167, 38, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.2);
+        }
+
+        /* Debug info */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 2rem;
+                margin: 10px;
+            }
+            
+            .auth-header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Info -->
+    <div class="debug-info" id="debug-info">
+        Server Status: <span id="server-status">Checking...</span><br>
+        API URL: <span id="api-url">http://localhost:3000/api</span>
+    </div>
+
+    <!-- Background Video -->
+    <div class="video-background">
+        <video id="bg-video" autoplay muted loop playsinline preload="auto">
+            <source src="4828605-uhd_4096_2160_25fps.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>BlogScript</h1>
+            <p>Welcome to our community</p>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="toggle-buttons">
+            <button class="toggle-btn active" id="signin-toggle" onclick="showSignIn()">Sign In</button>
+            <button class="toggle-btn" id="signup-toggle" onclick="showSignUp()">Sign Up</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <form class="auth-form active" id="signin-form">
+            <div class="form-group">
+                <label for="signin-email">Email Address</label>
+                <input type="email" id="signin-email" name="email" placeholder="Enter your email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="signin-password">Password</label>
+                <input type="password" id="signin-password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="submit-btn" id="signin-btn">
+                <div class="loading-spinner" id="signin-spinner"></div>
+                <span id="signin-text">Sign In</span>
+            </button>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form class="auth-form" id="signup-form">
+            <div class="form-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" name="name" placeholder="Enter your full name" required autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" name="email" placeholder="Enter your email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" name="password" placeholder="Create a password" required autocomplete="new-password" minlength="8">
+            </div>
+            <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" name="confirmPassword" placeholder="Confirm your password" required autocomplete="new-password">
+            </div>
+            <button type="submit" class="submit-btn" id="signup-btn">
+                <div class="loading-spinner" id="signup-spinner"></div>
+                <span id="signup-text">Create Account</span>
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="home.html">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:3000/api';
+        const DEBUG_MODE = true; // Set to false to hide debug info
+
+        // Show debug info if enabled
+        if (DEBUG_MODE) {
+            document.getElementById('debug-info').style.display = 'block';
+        }
+
+        // Utility functions
+        function log(message, data = null) {
+            console.log(`[AUTH] ${message}`, data || '');
+            if (DEBUG_MODE) {
+                const debugInfo = document.getElementById('debug-info');
+                debugInfo.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${message}`;
+            }
+        }
+
+        // Check server connection
+        async function checkServerConnection() {
+            try {
+                log('Checking server connection...');
+                const response = await fetch(`${API_URL}/test`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Server connected successfully', data);
+                    document.getElementById('server-status').textContent = '✅ Connected';
+                    return true;
+                } else {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+            } catch (error) {
+                log('❌ Server connection failed', error.message);
+                document.getElementById('server-status').textContent = '❌ Disconnected';
+                showMessage('Cannot connect to server. Please make sure the server is running on port 3000.', 'error');
+                return false;
+            }
+        }
+
+        // Toggle between Sign In and Sign Up
+        function showSignIn() {
+            log('Switching to Sign In form');
+            
+            // Update toggle buttons
+            document.getElementById('signin-toggle').classList.add('active');
+            document.getElementById('signup-toggle').classList.remove('active');
+            
+            // Update forms
+            document.getElementById('signin-form').classList.add('active');
+            document.getElementById('signup-form').classList.remove('active');
+            
+            hideMessage();
+            clearErrors();
+            clearForms();
+        }
+
+        function showSignUp() {
+            log('Switching to Sign Up form');
+            
+            // Update toggle buttons
+            document.getElementById('signin-toggle').classList.remove('active');
+            document.getElementById('signup-toggle').classList.add('active');
+            
+            // Update forms
+            document.getElementById('signin-form').classList.remove('active');
+            document.getElementById('signup-form').classList.add('active');
+            
+            hideMessage();
+            clearErrors();
+            clearForms();
+        }
+
+        // Message handling
+        function showMessage(text, type) {
+            log(`Showing ${type} message: ${text}`);
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    hideMessage();
+                }, 5000);
+            }
+        }
+
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+
+        // Error handling
+        function clearErrors() {
+            document.querySelectorAll('input').forEach(input => {
+                input.classList.remove('error');
+            });
+        }
+
+        function showFieldError(fieldId) {
+            document.getElementById(fieldId).classList.add('error');
+        }
+
+        function clearForms() {
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type !== 'submit') {
+                    input.value = '';
+                }
+            });
+        }
+
+        // Loading states
+        function setLoading(formType, isLoading) {
+            const btn = document.getElementById(`${formType}-btn`);
+            const spinner = document.getElementById(`${formType}-spinner`);
+            const text = document.getElementById(`${formType}-text`);
+            
+            btn.disabled = isLoading;
+            spinner.style.display = isLoading ? 'inline-block' : 'none';
+            
+            if (isLoading) {
+                text.textContent = formType === 'signin' ? 'Signing In...' : 'Creating Account...';
+            } else {
+                text.textContent = formType === 'signin' ? 'Sign In' : 'Create Account';
+            }
+        }
+
+        // Validation functions
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 8;
+        }
+
+        // Sign In Form Handler
+        document.getElementById('signin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            log('Sign In form submitted');
+            
+            const email = document.getElementById('signin-email').value.trim();
+            const password = document.getElementById('signin-password').value;
+            
+            clearErrors();
+            hideMessage();
+            
+            // Validation
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                if (!email) showFieldError('signin-email');
+                if (!password) showFieldError('signin-password');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                showFieldError('signin-email');
+                return;
+            }
+            
+            setLoading('signin', true);
+            
+            try {
+                log('Sending login request', { email });
+                
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                log('Login response received', data);
+                
+                if (data.success) {
+                    // Store authentication data
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    
+                    showMessage(`Welcome back, ${data.user.name}!`, 'success');
+                    log('Login successful, redirecting to dashboard');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 1500);
+                } else {
+                    showMessage(data.message, 'error');
+                    if (data.message.includes('email')) {
+                        showFieldError('signin-email');
+                    } else if (data.message.includes('password')) {
+                        showFieldError('signin-password');
+                    }
+                }
+            } catch (error) {
+                log('Login error', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            }
+            
+            setLoading('signin', false);
+        });
+
+        // Sign Up Form Handler
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            log('Sign Up form submitted');
+            
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            clearErrors();
+            hideMessage();
+            
+            // Validation
+            if (!name || !email || !password || !confirm) {
+                showMessage('Please fill in all fields', 'error');
+                if (!name) showFieldError('signup-name');
+                if (!email) showFieldError('signup-email');
+                if (!password) showFieldError('signup-password');
+                if (!confirm) showFieldError('signup-confirm');
+                return;
+            }
+            
+            if (name.length < 2) {
+                showMessage('Name must be at least 2 characters long', 'error');
+                showFieldError('signup-name');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                showFieldError('signup-email');
+                return;
+            }
+            
+            if (!validatePassword(password)) {
+                showMessage('Password must be at least 8 characters long', 'error');
+                showFieldError('signup-password');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showMessage('Passwords do not match', 'error');
+                showFieldError('signup-confirm');
+                return;
+            }
+            
+            setLoading('signup', true);
+            
+            try {
+                log('Sending registration request', { name, email });
+                
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                log('Registration response received', data);
+                
+                if (data.success) {
+                    // Store authentication data
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    
+                    showMessage(`Welcome to BlogScript, ${data.user.name}!`, 'success');
+                    log('Registration successful, redirecting to dashboard');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 1500);
+                } else {
+                    showMessage(data.message, 'error');
+                    if (data.message.includes('email')) {
+                        showFieldError('signup-email');
+                    }
+                }
+            } catch (error) {
+                log('Registration error', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            }
+            
+            setLoading('signup', false);
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('Auth page loaded, initializing...');
+            
+            // Check server connection
+            await checkServerConnection();
+            
+            // Focus on first input
+            document.getElementById('signin-email').focus();
+            
+            log('Auth page initialization complete');
+        });
+
+        // Video handling
+        const video = document.getElementById('bg-video');
+        video.addEventListener('loadeddata', () => {
+            video.play().catch(e => {
+                log('Video autoplay failed', e.message);
+            });
+        });
+
+        log('Auth page script loaded successfully');
+    </script>
+</body>
+</html>

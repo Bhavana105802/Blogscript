@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - BlogScript</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .settings-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .settings-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .profile-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .profile-stat:last-child {
+            border-bottom: none;
+        }
+
+        .profile-stat strong {
+            color: white;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .danger-zone {
+            border: 2px solid rgba(244, 67, 54, 0.3);
+            background: rgba(244, 67, 54, 0.1);
+        }
+
+        .danger-zone .section-title {
+            color: #f44336;
+        }
+
+        .danger-warning {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #f44336;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Settings</h1>
+            <div class="nav-links">
+                <a href="/">🏠 Dashboard</a>
+                <a href="/create-post">✍️ Create Post</a>
+                <a href="/my-posts">📚 My Posts</a>
+                <a href="/browse-blogs">🌐 Browse</a>
+                <a href="/analytics">📊 Analytics</a>
+            </div>
+        </div>
+
+        <div class="settings-sections">
+            <!-- Profile Settings -->
+            <div class="settings-section">
+                <h2 class="section-title">👤 Profile Settings</h2>
+                
+                <div id="profileMessage"></div>
+                
+                <div class="profile-info" id="profileInfo">
+                    <div class="profile-stat">
+                        <span>Loading profile...</span>
+                    </div>
+                </div>
+
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="avatar">Avatar URL</label>
+                        <input type="url" id="avatar" name="avatar" placeholder="https://example.com/avatar.jpg">
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">💾 Save Profile</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-section">
+                <h2 class="section-title">🔒 Security Settings</h2>
+                
+                <div id="passwordMessage"></div>
+
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password" required>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">🔐 Change Password</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preferences -->
+            <div class="settings-section">
+                <h2 class="section-title">🎨 Preferences</h2>
+                
+                <div class="form-group">
+                    <label>Theme</label>
+                    <div style="display: flex; gap: 15px; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="setTheme('default')">🌈 Default</button>
+                        <button class="btn btn-secondary" onclick="setTheme('dark')">🌙 Dark</button>
+                        <button class="btn btn-secondary" onclick="setTheme('light')">☀️ Light</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notifications</label>
+                    <div style="display: flex; gap: 15px; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="toggleNotifications()">🔔 Enable Notifications</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="settings-section danger-zone">
+                <h2 class="section-title">⚠️ Danger Zone</h2>
+                
+                <div class="danger-warning">
+                    ⚠️ <strong>Warning:</strong> These actions are irreversible. Please proceed with caution.
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+                    <button class="btn btn-danger" onclick="deleteAccount()">❌ Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = '/auth.html';
+        }
+
+        // Load profile on page load
+        loadProfile();
+
+        // Form event listeners
+        document.getElementById('profileForm').addEventListener('submit', updateProfile);
+        document.getElementById('passwordForm').addEventListener('submit', changePassword);
+
+        async function loadProfile() {
+            try {
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const user = result.user;
+                    
+                    // Update profile info display
+                    document.getElementById('profileInfo').innerHTML = `
+                        <div class="profile-stat">
+                            <span>Member Since:</span>
+                            <strong>${new Date(user.createdAt).toLocaleDateString()}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Last Login:</span>
+                            <strong>${new Date(user.lastLogin).toLocaleDateString()}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Total Views:</span>
+                            <strong>${user.totalViews || 0}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Total Likes:</span>
+                            <strong>${user.totalLikes || 0}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Followers:</span>
+                            <strong>${user.followers || 0}</strong>
+                        </div>
+                    `;
+
+                    // Populate form fields
+                    document.getElementById('name').value = user.name || '';
+                    document.getElementById('email').value = user.email || '';
+                    document.getElementById('bio').value = user.bio || '';
+                    document.getElementById('avatar').value = user.avatar || '';
+                } else {
+                    showMessage('profileMessage', '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('profileMessage', '❌ Network error loading profile', 'error');
+            }
+        }
+
+        async function updateProfile(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const profileData = {
+                name: formData.get('name'),
+                bio: formData.get('bio'),
+                avatar: formData.get('avatar')
+            };
+
+            try {
+                e.target.classList.add('loading');
+                
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('profileMessage', '✅ Profile updated successfully!', 'success');
+                    loadProfile(); // Reload profile data
+                } else {
+                    showMessage('profileMessage', '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('profileMessage', '❌ Network error updating profile', 'error');
+            } finally {
+                e.target.classList.remove('loading');
+            }
+        }
+
+        async function changePassword(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const currentPassword = formData.get('currentPassword');
+            const newPassword = formData.get('newPassword');
+            const confirmPassword = formData.get('confirmPassword');
+
+            // Validate passwords match
+            if (newPassword !== confirmPassword) {
+                showMessage('passwordMessage', '❌ New passwords do not match', 'error');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                showMessage('passwordMessage', '❌ New password must be at least 8 characters', 'error');
+                return;
+            }
+
+            try {
+                e.target.classList.add('loading');
+                
+                const response = await fetch('/api/change-password', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        currentPassword,
+                        newPassword
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('passwordMessage', '✅ Password changed successfully!', 'success');
+                    e.target.reset(); // Clear form
+                } else {
+                    showMessage('passwordMessage', '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('passwordMessage', '❌ Network error changing password', 'error');
+            } finally {
+                e.target.classList.remove('loading');
+            }
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem('blogscript-theme', theme);
+            showMessage('profileMessage', `🎨 Theme set to ${theme}`, 'success');
+        }
+
+        function toggleNotifications() {
+            const enabled = localStorage.getItem('blogscript-notifications') === 'true';
+            localStorage.setItem('blogscript-notifications', !enabled);
+            showMessage('profileMessage', `🔔 Notifications ${!enabled ? 'enabled' : 'disabled'}`, 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Are you sure you want to clear all your local data? This will log you out and remove all saved preferences.')) {
+                localStorage.clear();
+                alert('✅ All local data cleared. You will be redirected to login.');
+                window.location.href = '/auth.html';
+            }
+        }
+
+        function deleteAccount() {
+            const confirmation = prompt('⚠️ Type "DELETE" to confirm account deletion:');
+            if (confirmation === 'DELETE') {
+                alert('🚧 Account deletion feature is not implemented yet. Please contact support.');
+            }
+        }
+
+        function showMessage(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

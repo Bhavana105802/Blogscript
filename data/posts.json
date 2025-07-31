@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "author": "Bhavana",
+    "title": "helpop",
+    "content": "ehehehehehehehehehhjdeojkfnaeklfnklfhohfkladjnckdohiknsklidjipklwmsAK;HDUOAHDIOALKNDKLASIOAJNKLdnoshdiolkaD;KjaijdmklSNDILHAIDJN;kdnhIDHIkjdoID9POIKWDKLNDJKABJNSKLCNZIJSKLFNMAJHJAKNDAKLJDPAKDMAKDJOIASDJNMK",
+    "category": "General",
+    "tags": [],
+    "createdAt": "2025-07-31T03:53:53.547Z",
+    "updatedAt": "2025-07-31T03:53:53.547Z",
+    "views": 0,
+    "likes": 0,
+    "comments": [],
+    "published": true
+  },
+  {
+    "id": 2,
+    "userId": 2,
+    "author": "riya",
+    "title": "vizag",
+    "content": "Visakhapatnam, also known as Vizag, is a major coastal city in the Indian state of Andhra Pradesh, located along the Bay of Bengal. Often called the \"City of Destiny,\" Vizag is known for its natural beauty, clean beaches, and industrial significance. The city is home to picturesque spots like RK Beach, Rushikonda Beach, Kailasagiri Hill Park, and the nearby Araku Valley and Borra Caves. It is also an important industrial and port city, hosting a major steel plant, shipyard, and several IT and pharmaceutical companies. Cultural landmarks such as the Simhachalam Temple, INS Kurusura Submarine Museum, and TU 142 Aircraft Museum add to its charm. With a tropical climate and strong infrastructure in education and transportation, Vizag blends natural beauty, modern development, and cultural heritage, making it one of India’s most vibrant and fast-growing cities.",
+    "category": "General",
+    "tags": [],
+    "createdAt": "2025-07-31T04:16:33.542Z",
+    "updatedAt": "2025-07-31T04:16:33.542Z",
+    "views": 0,
+    "likes": 0,
+    "comments": [],
+    "published": true
+  }
+]

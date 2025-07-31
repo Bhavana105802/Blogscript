@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogScript - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Video */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .video-background video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translateX(-50%) translateY(-50%);
+            filter: brightness(0.4) contrast(1.2) saturate(1.1);
+            object-fit: cover;
+        }
+
+        /* Fallback background */
+        .video-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffa726;
+            text-decoration: none;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+        }
+
+        .user-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 167, 38, 0.2);
+            border-color: #ffa726;
+            color: #ffa726;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            height: fit-content;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h3 {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.4);
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            gap: 2rem;
+        }
+
+        /* Glass Container Base */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            color: #ffa726;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .welcome-section p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 8px 25px rgba(255, 167, 38, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 167, 38, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255, 167, 38, 0.2);
+            border-color: #ffa726;
+            color: #ffa726;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 25px rgba(255, 167, 38, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Recent Activity */
+        .recent-activity h3 {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 167, 38, 0.1);
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.25rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .activity-time {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Quick Actions */
+        .quick-actions h3 {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .quick-action-item {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(255, 167, 38, 0.3);
+        }
+
+        .quick-action-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 167, 38, 0.4);
+        }
+
+        .quick-action-item i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-top: 6px solid #ffa726;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Background Video -->
+    <div class="video-background">
+        <video id="bg-video" autoplay muted loop playsinline preload="auto">
+            <source src="4828605-uhd_4096_2160_25fps.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">BlogScript</a>
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <span class="user-name" id="user-name">User</span>
+                <a href="#" class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3>Navigation</h3>
+            <a href="/" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/create-post" class="nav-item">
+                <i class="fas fa-plus"></i>
+                <span>Create Post</span>
+            </a>
+            <a href="/my-posts" class="nav-item">
+                <i class="fas fa-edit"></i>
+                <span>My Posts</span>
+            </a>
+            <a href="/browse-blogs" class="nav-item">
+                <i class="fas fa-book-open"></i>
+                <span>Browse Blogs</span>
+            </a>
+            <a href="/analytics" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Section -->
+            <section class="welcome-section glass-container">
+                <h1>Welcome to Your Dashboard!</h1>
+                <p>Start your blogging journey with BlogScript. Share your stories with the world and connect with fellow writers.</p>
+                <div class="action-buttons">
+                    <a href="/create-post" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        Create New Post
+                    </a>
+                    <a href="/browse-blogs" class="action-btn secondary">
+                        <i class="fas fa-book-open"></i>
+                        Browse Blogs
+                    </a>
+                </div>
+            </section>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card glass-container">
+                    <div class="stat-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="stat-number" id="total-posts">0</div>
+                    <div class="stat-label">Total Posts</div>
+                </div>
+                <div class="stat-card glass-container">
+                    <div class="stat-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-number" id="total-views">0</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="stat-card glass-container">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-number" id="total-likes">0</div>
+                    <div class="stat-label">Total Likes</div>
+                </div>
+                <div class="stat-card glass-container">
+                    <div class="stat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-number" id="total-comments">0</div>
+                    <div class="stat-label">Total Comments</div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity glass-container">
+                <h3>
+                    <i class="fas fa-clock"></i>
+                    Recent Activity
+                </h3>
+                <div id="recent-activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Welcome to BlogScript!</div>
+                            <div class="activity-time">Start by creating your first post</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions glass-container">
+                <h3>
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h3>
+                <div class="quick-action-grid">
+                    <a href="/create-post" class="quick-action-item">
+                        <i class="fas fa-plus"></i>
+                        New Post
+                    </a>
+                    <a href="/my-posts" class="quick-action-item">
+                        <i class="fas fa-edit"></i>
+                        My Posts
+                    </a>
+                    <a href="/analytics" class="quick-action-item">
+                        <i class="fas fa-chart-line"></i>
+                        View Stats
+                    </a>
+                    <a href="/settings" class="quick-action-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Loading screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/auth.html';
+                return false;
+            }
+            return token;
+        }
+
+        // Get user info
+        async function getUserInfo() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_URL}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('user-name').textContent = data.user.name;
+                    document.getElementById('user-avatar').textContent = data.user.name.charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        }
+
+        // Get analytics data
+        async function getAnalytics() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_URL}/analytics`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    const analytics = data.analytics;
+                    
+                    // Update stats
+                    document.getElementById('total-posts').textContent = analytics.totalPosts;
+                    document.getElementById('total-views').textContent = analytics.totalViews.toLocaleString();
+                    document.getElementById('total-likes').textContent = analytics.totalLikes.toLocaleString();
+                    document.getElementById('total-comments').textContent = analytics.totalComments.toLocaleString();
+
+                    // Update recent activity
+                    updateRecentActivity(analytics.recentPosts);
+
+                    // Animate stats
+                    animateStats();
+                }
+            } catch (error) {
+                console.error('Error fetching analytics:', error);
+            }
+        }
+
+        // Update recent activity
+        function updateRecentActivity(recentPosts) {
+            const activityList = document.getElementById('recent-activity-list');
+            
+            if (recentPosts && recentPosts.length > 0) {
+                activityList.innerHTML = '';
+                
+                recentPosts.forEach(post => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Published "${post.title}"</div>
+                            <div class="activity-time">${formatDate(post.createdAt)} • ${post.views} views • ${post.likes} likes</div>
+                        </div>
+                    `;
+                    activityList.appendChild(activityItem);
+                });
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return '1 day ago';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Animate stats
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = parseInt(stat.textContent.replace(/,/g, ''));
+                let currentValue = 0;
+                const increment = finalValue / 50;
+                
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        stat.textContent = finalValue.toLocaleString();
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(currentValue).toLocaleString();
+                    }
+                }, 30);
+            });
+        }
+
+        // Logout function
+        async function logout() {
+            const token = localStorage.getItem('authToken');
+            
+            if (token) {
+                try {
+                    await fetch(`${API_URL}/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+            
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/auth.html';
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            await getUserInfo();
+            await getAnalytics();
+        });
+
+        // Video handling
+        const video = document.getElementById('bg-video');
+        video.addEventListener('loadeddata', () => {
+            video.play().catch(e => {
+                console.log('Video autoplay failed:', e.message);
+            });
+        });
+    </script>
+</body>
+</html>
